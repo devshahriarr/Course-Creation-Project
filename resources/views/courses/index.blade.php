@@ -17,7 +17,7 @@
             background: #28a745;
             padding: 10px 20px;
             margin-bottom: 20px;
-            text-align: center; /* Center alignment */
+            text-align: center;
         }
         .menubar a {
             color: #fff;
@@ -29,7 +29,7 @@
             color: #218b39;
         }
         .container {
-            max-width: 1200px; /* Wider for table */
+            max-width: 1200px;
             margin: 0 auto;
             background: #ffffff;
             padding: 20px 30px;
@@ -40,15 +40,17 @@
             text-align: center;
             margin-bottom: 20px;
         }
+
+        /** CSS for Course list table**/
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Shadow for table */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 12px; /* Better padding for alignment */
+            padding: 12px;
             text-align: left;
         }
         th {
@@ -57,10 +59,10 @@
             font-weight: bold;
         }
         tr:nth-child(even) {
-            background-color: #f2f2f2; /* Alternating rows for better readability */
+            background-color: #f2f2f2;
         }
         tr:hover {
-            background-color: #e8f5e8; /* Hover effect */
+            background-color: #e8f5e8;
         }
         .error {
             color: #e94560;
@@ -76,7 +78,7 @@
         }
         @media (max-width: 768px) {
             table, th, td {
-                font-size: 14px; /* Responsive for mobile */
+                font-size: 14px;
             }
         }
     </style>

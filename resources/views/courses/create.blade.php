@@ -17,7 +17,7 @@
             background: #28a745;
             padding: 10px 20px;
             margin-bottom: 20px;
-            text-align: center; /* Center alignment for menubar */
+            text-align: center;
         }
         .menubar a {
             color: #fff;
@@ -34,7 +34,7 @@
             background: #ffffff;
             padding: 20px 30px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for better alignment */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         h1, h2, h3 {
             text-align: center;
@@ -42,44 +42,44 @@
         }
         input, textarea, select {
             width: 100%;
-            padding: 10px; /* Increased padding for better alignment */
-            margin: 10px 0; /* Consistent margin */
+            padding: 10px;
+            margin: 10px 0;
             background: #ffffff;
             color: #262424;
             border: 1px solid #533483;
             border-radius: 4px;
-            box-sizing: border-box; /* Prevents overflow */
+            box-sizing: border-box;
         }
         .category-section {
             display: flex;
             align-items: center;
-            gap: 10px; /* Better spacing between select and button */
+            gap: 10px;
         }
         .category-section select {
             flex: 1;
-            margin: 0; /* Remove default margin */
+            margin: 0;
         }
         .module {
             background: #ffffff;
-            margin: 15px 0; /* Increased margin for nested structure */
-            padding: 20px; /* More padding for alignment */
+            margin: 15px 0;
+            padding: 20px;
             border-radius: 6px;
             border-left: 4px solid #29b74a;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Light shadow for depth */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .content {
             background: #d2d3d7;
             margin: 10px 0;
-            padding: 15px; /* Consistent padding */
+            padding: 15px;
             border-radius: 4px;
             border-left: 4px solid #533483;
-            position: relative; /* For better nesting */
+            position: relative;
         }
         button {
             background: #28a745;
             color: #fff;
             border: none;
-            padding: 10px 15px; /* Consistent padding */
+            padding: 10px 15px;
             cursor: pointer;
             border-radius: 4px;
             margin: 5px;
@@ -90,7 +90,7 @@
         .error {
             color: #e94560;
             font-size: 0.9em;
-            display: block; /* Ensure block display for alignment below fields */
+            display: block;
             margin-top: 5px;
         }
         .success {
@@ -101,7 +101,8 @@
             border-radius: 4px;
             margin-bottom: 20px;
         }
-        /* Modal CSS - Kept as is, but aligned */
+
+        /** CSS for category creation Modal**/
         .modal {
             display: none;
             position: fixed;
@@ -133,6 +134,27 @@
         .modal-content button:hover {
             background: #218b39;
         }
+
+        /** Error styling **/
+        .errors-list {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .errors-list h3 {
+            color: #721c24;
+            margin-top: 0;
+        }
+        .error-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .error-list li {
+            color: #721c24;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -151,10 +173,22 @@
             <p class="error">{{ session('error') }}</p>
         @endif
 
-        <form method="POST" action="{{ route('courses.store') }}" id="courseForm">
+        @if ($errors->any())
+            <div class="errors-list">
+                <h3>Validation Errors:</h3>
+                <ul class="error-list">
+                    @foreach ($errors->all() as $error)
+                        <li class="error">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('courses.store') }}" id="courseForm" enctype="multipart/form-data">
             @csrf
 
             <!-- Course Fields -->
+
             <h2>Course Details</h2>
             <input type="text" name="title" placeholder="Course Title" value="{{ old('title') }}" required>
             @error('title') <span class="error">{{ $message }}</span> @enderror
@@ -176,6 +210,12 @@
                 <button type="button" id="addCategory">+ Add New</button>
             </div>
             @error('course_category_id') <span class="error">{{ $message }}</span> @enderror
+            <label for="feature_image">Feature Image</label>
+            <input id="feature_image" type="file" name="feature_image" accept="image/*">
+            @error('feature_image') <span class="error">{{ $message }}</span> @enderror
+            <label for="feature_video">Feature Video</label>
+            <input id="feature_video" type="file" name="feature_video" accept="video/*">
+            @error('feature_video') <span class="error">{{ $message }}</span> @enderror
 
             <!-- Modules Section -->
             <h2>Modules</h2>
@@ -229,20 +269,23 @@
                 $(this).closest('.module').remove();
             });
 
+            // Add content and handle type change
             $(document).on('click', '.addContent', function() {
                 const moduleId = $(this).data('module');
                 const contentCount = $(`.contents[data-module="${moduleId}"] .content`).length + 1;
                 const contentHtml = `
                     <div class="content">
                         <input type="text" name="modules[${moduleId}][contents][${contentCount}][title]" placeholder="Content Title (optional)">
-                        <select name="modules[${moduleId}][contents][${contentCount}][type]" required>
+                        <select name="modules[${moduleId}][contents][${contentCount}][type]" class="content-type" required>
                             <option value="">Select Type</option>
                             <option value="text">Text</option>
                             <option value="image">Image</option>
                             <option value="video">Video</option>
                             <option value="link">Link</option>
                         </select>
-                        <textarea name="modules[${moduleId}][contents][${contentCount}][content]" placeholder="Content (e.g., text or URL)" required rows="2"></textarea>
+                        <div class="content-input" data-content="${contentCount}">
+                            <textarea name="modules[${moduleId}][contents][${contentCount}][content]" placeholder="Content (e.g., text or URL)" required rows="2"></textarea>
+                        </div>
                         <button type="button" class="removeContent">Remove Content</button>
                         <span class="error-message"></span>
                     </div>
@@ -250,12 +293,73 @@
                 $(`.contents[data-module="${moduleId}"]`).append(contentHtml);
             });
 
+            // Handle content type change
+            // $(document).on('change', '.content-type', function() {
+            //     const $contentDiv = $(this).closest('.content').find('.content-input');
+            //     const contentCount = $contentDiv.data('content');
+            //     const moduleId = $(this).closest('.content').closest('.contents').data('module');
+            //     const type = $(this).val();
+
+            //     // Remove existing input
+            //     $contentDiv.empty();
+
+            //     // Add new input based on type
+            //     let newInput;
+            //     switch (type) {
+            //         case 'text':
+            //             newInput = `<textarea name="modules[${moduleId}][contents][${contentCount}][content]" placeholder="Enter text content" required rows="2"></textarea>`;
+            //             break;
+            //         case 'image':
+            //             newInput = `<input type="file" name="modules[${moduleId}][contents][${contentCount}][content]" accept="image/*" required>`;
+            //             break;
+            //         case 'video':
+            //             newInput = `<input type="file" name="modules[${moduleId}][contents][${contentCount}][content]" accept="video/*" required>`;
+            //             break;
+            //         case 'link':
+            //             newInput = `<input type="text" name="modules[${moduleId}][contents][${contentCount}][content]" placeholder="Enter URL" required>`;
+            //             break;
+            //         default:
+            //             newInput = `<textarea name="modules[${moduleId}][contents][${contentCount}][content]" placeholder="Content (e.g., text or URL)" required rows="2"></textarea>`;
+            //     }
+            //     $contentDiv.append(newInput);
+            // });
+
+            $(document).on('change', '.content-type', function() {
+                const $contentDiv = $(this).closest('.content').find('.content-input');
+                const contentCount = $contentDiv.data('content');
+                const moduleId = $(this).closest('.content').closest('.contents').data('module');
+                const type = $(this).val();
+
+                // Remove existing input
+                $contentDiv.empty();
+
+                // Add new input based on type with correct name
+                let newInput;
+                switch (type) {
+                    case 'text':
+                        newInput = `<textarea name="modules[${moduleId}][contents][${contentCount}][content]" placeholder="Enter text content" required rows="2"></textarea>`;
+                        break;
+                    case 'image':
+                        newInput = `<input type="file" name="modules[${moduleId}][contents][${contentCount}][content_file]" accept="image/*" required>`;
+                        break;
+                    case 'video':
+                        newInput = `<input type="file" name="modules[${moduleId}][contents][${contentCount}][content_file]" accept="video/*" required>`;
+                        break;
+                    case 'link':
+                        newInput = `<input type="text" name="modules[${moduleId}][contents][${contentCount}][content]" placeholder="Enter URL" required>`;
+                        break;
+                    default:
+                        newInput = `<textarea name="modules[${moduleId}][contents][${contentCount}][content]" placeholder="Content (e.g., text or URL)" required rows="2"></textarea>`;
+                }
+                $contentDiv.append(newInput);
+            });
+
             // Remove content
             $(document).on('click', '.removeContent', function() {
                 $(this).closest('.content').remove();
             });
 
-            // Frontend Validation (scoped to course form) - Basic for now, can enhance later
+            // Course Creation
             $('#courseForm').submit(function(e) {
                 const title = $('input[name="title"]').val().trim(); // Trim spaces
                 if (!title) {
