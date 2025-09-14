@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('contents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('module_id')->constrained()->onDelete('cascade');
-            $table->string('type'); // e.g., 'text', 'image', 'video', 'link'
-            $table->text('content'); // Main content (text, URL for image/video/link)
-            $table->string('title')->nullable(); // Optional title for content item
+            $table->string('type');
+            $table->text('content');
+            $table->string('title')->nullable();
             $table->timestamps();
         });
     }

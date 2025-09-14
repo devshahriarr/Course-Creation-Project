@@ -23,7 +23,7 @@ class CourseController extends Controller {
 
 
     public function index() {
-        $courses = Course::with(['course_category', 'modules.contents'])->paginate(10); // Optional: Add pagination
+        $courses = Course::with(['course_category', 'modules.contents'])->paginate(10);
         // dd($courses);
         return view('courses.index', compact('courses'));
     }
@@ -128,7 +128,7 @@ class CourseController extends Controller {
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput(); // Standard way: withErrors sets $errors
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
         try {
@@ -136,7 +136,7 @@ class CourseController extends Controller {
 
             // Handle course files
             $courseData = $request->only(['title', 'description', 'course_category_id', 'price']);
-            if ($request->hasFile('feature_image')) { // Fixed: no 'image' field
+            if ($request->hasFile('feature_image')) {
                 $courseData['feature_image'] = $request->file('feature_image')->store('public/courses');
             }
             if ($request->hasFile('feature_video')) {
@@ -160,7 +160,7 @@ class CourseController extends Controller {
                             $path = $request->file($fileKey)->store("public/contents/{$contentData['type']}");
                             $contentDataArr['content'] = $path;
                         } else if (!in_array($contentData['type'], ['image', 'video'])) {
-                            $contentDataArr['content'] = $contentData['content'] ?? ''; // Ensure string for text/link
+                            $contentDataArr['content'] = $contentData['content'] ?? '';
                         }
                         $module->contents()->create($contentDataArr);
                     }
